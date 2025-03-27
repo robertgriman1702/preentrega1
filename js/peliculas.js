@@ -11,4 +11,4 @@ function nextSlide() {
     sliderInner.style.transform = `translateX(${percentage}%)`;
 }
 
-setInterval(nextSlide, 3000); 
+setInterval(nextSlide, 4000); 
