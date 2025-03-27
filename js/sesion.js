@@ -1,55 +1,39 @@
-function evaluador(novacio){
-    if (novacio == null){
-        alert("el usuario ha cancelado");
-        return false
-        
+function validarInput(input) {
+    if (input === null) {
+        alert("Operación cancelada por el usuario");
+        return false;
     }
     
-    if (novacio.trim().length === 0){
-        alert("el campo no puede estar vacio");
-        return null
+    if (input.trim() === "") {
+        alert("El campo no puede estar vacío");
+        return null;
     }
-    else{
-        return true
-    }
+    
+    return true;
 }
 
 const sesionBoton = document.getElementById("sesion");
-let user= [];
+let user = [];
 
-sesionBoton.addEventListener("click", function () {
-        let usuariovalido = false;
-        let contraseñavalida = false;
-        let usuario, contraseña;
+sesionBoton.addEventListener("click", function() {
+    user = [];
+    
+    const usuario = prompt("Ingrese su nombre de usuario:");
+    const usuarioValido = validarInput(usuario);
+    
+    if (usuarioValido === false) return; 
+    if (usuarioValido === null) return; 
+    
+    const contraseña = prompt("Ingrese su contraseña:");
+    const contraseñaValida = validarInput(contraseña);
+    
+    if (contraseñaValida === false) return;
+    if (contraseñaValida === null) return;
+    
+    user.push(usuario.trim(), contraseña.trim());
+    alert(`Bienvenido ${user[0]}`);
+});
 
-        user.length=0;
-        do {
-            if (!usuariovalido) {
-                usuario = prompt("Ingrese su nombre de usuario:");
-                let cancelador = evaluador(usuario);
-                if(cancelador === false){
-                    break;
-                }
-                else if (cancelador === true){
-                    usuariovalido= true
-                    user.push(usuario)
-                }
-            }
-            if (usuariovalido && !contraseñavalida) {
-                contraseña = prompt("Ingrese su contraseña:");
-                let canceladorContra = evaluador(contraseña);
-                if (canceladorContra === false){
-                    break;}
-                else if(canceladorContra === true) {
-                    contraseñavalida= true
-                    user.push(contraseña)
-                }
-            }
-        } while (!usuariovalido || !contraseñavalida);
-        alert(`Bienvenido ${user[0]}`);
-    });
-
-    export default function obtenerUser() {
-        return user;
-    }
-
+export default function obtenerUser() {
+    return user;
+}
