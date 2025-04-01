@@ -1,3 +1,6 @@
+>.[!NOTE].
+>Bienvenido a mi proyecto
+
 Descripción
 Este proyecto es un sitio web interactivo para un cine que permite hacer lo siguiente:
 
