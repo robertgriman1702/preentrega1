@@ -7,9 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const registro = document.getElementById('register-form');
     const volverALogin = document.getElementById('vueltaModal');
     const userStatusContainer = document.getElementById('user-status');
+    
     const loginMessage = document.createElement('div');
     const registerMessage = document.createElement('div');
-
     loginMessage.className = 'message';
     registerMessage.className = 'message';
     loginForm.prepend(loginMessage);
@@ -75,13 +75,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         localStorage.setItem('userData', JSON.stringify(userData));
-        
         registro.classList.remove('active');
         loginForm.classList.remove('hidden');
-        
         loginMessage.textContent = 'Registro exitoso. Ahora puedes iniciar sesión.';
         loginMessage.className = 'message success';
-        
         event.target.reset();
     });
 
@@ -107,7 +104,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (loginUsuario === savedUserData.usuario && loginContraseña === savedUserData.contraseña) {
             localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('currentUser', JSON.stringify(savedUserData));
+            localStorage.setItem('currentUser', JSON.stringify({
+                nombre: savedUserData.nombre,
+                email: savedUserData.email,
+                usuario: savedUserData.usuario
+            }));
             
             modal.classList.remove('active');
             checkLoginStatus();
@@ -122,6 +123,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 3000);
             
             event.target.reset();
+            
+            document.dispatchEvent(new CustomEvent('loginStatusChanged', {
+                detail: { isLoggedIn: true, user: savedUserData }
+            }));
         } else {
             loginMessage.textContent = 'Usuario o contraseña incorrectos';
             loginMessage.className = 'message error';
@@ -151,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 registerMessage.textContent = '';
             });
         }
-    };
+    }
 
     function logout() {
         localStorage.removeItem('isLoggedIn');
@@ -166,5 +171,9 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             goodbyeMessage.remove();
         }, 3000);
-    };
-})
+        
+        document.dispatchEvent(new CustomEvent('loginStatusChanged', {
+            detail: { isLoggedIn: false }
+        }));
+    }
+});

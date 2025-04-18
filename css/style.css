@@ -189,7 +189,49 @@ body {
     color: #721c24;
     border: 1px solid #f5c6cb;
 }
-/* Modal seleccionador de peliculas*/
+/* seleccionador de peliculas*/ 
+
+.mensaje-sesion {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(10, 10, 10, 0.74);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.mensaje-sesion.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.mensaje-content {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    background-color: white;
+    border-radius: 6px;
+    padding: 3rem 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.mensaje-sesion.active .mensaje-content {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Modal seleccionador de peliculas */
 .modal-seleccionador {
     position: fixed;
     top: 0;
@@ -236,7 +278,7 @@ body {
     margin-bottom: 1.5rem;
     font-family: "Bebas Neue", sans-serif;
     font-size: 2rem;
-    color: #131211;
+    color: #FFA400; /* Cambiado para mejor contraste */
     letter-spacing: 1px;
 }
 
@@ -269,7 +311,7 @@ body {
     position: relative;
     width: 100%;
     height: 0;
-    padding-bottom: 150%; 
+    padding-bottom: 150%;
     overflow: hidden;
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -314,6 +356,7 @@ body {
 .movie-meta .rating {
     color: #FFA400;
 }
+
 .carousel-btn {
     position: absolute;
     top: 50%;
@@ -350,6 +393,7 @@ body {
 .next-btn {
     right: -20px;
 }
+
 .carousel-dots {
     display: flex;
     justify-content: center;
@@ -438,15 +482,15 @@ body {
         width: 95%;
         padding: 1.5rem;
     }
-    
+
     .prev-btn {
         left: -10px;
     }
-    
+
     .next-btn {
         right: -10px;
     }
-    
+
     .movie-poster {
         padding-bottom: 142.85%;
     }
@@ -525,13 +569,13 @@ body {
     margin: 0 auto;
     overflow: hidden;
     border-radius: 8px;
-    background-color: #232528; /* Fondo coherente */
+    background-color: #232528;
 }
 
 .slider-track {
     display: flex;
     transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    height: 70vh; /* Altura ajustable */
+    height: 70vh; 
     max-height: 600px;
 }
 
@@ -541,7 +585,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #232528; /* Fondo para áreas no cubiertas por la imagen */
+    background-color: #232528; 
 }
 
 .img-container {
