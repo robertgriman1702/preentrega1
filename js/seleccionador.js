@@ -1,78 +1,111 @@
-import obtenerUser from './sesion.js';
-import { verificarUser, convertirNumero } from './compra.js';
+document.addEventListener('DOMContentLoaded', function() {
+    const openModal = document.querySelector('#seleccionar');
+    const closeModal = document.querySelector('.close-modal-seleccionador');
+    const modal = document.querySelector('.modal-seleccionador');
+    
+    const carousel = document.querySelector('.carousel');
+    const prevBtn = document.querySelector('.prev-btn');
+    const nextBtn = document.querySelector('.next-btn');
+    const dotsContainer = document.querySelector('.carousel-dots');
+    const carouselItems = document.querySelectorAll('.carousel-item');
+    
+    let currentIndex = 0;
+    let autoSlideInterval;
+    const slideIntervalTime = 5000; 
 
-const peliculas = [
-    {
-        id: 1,
-        titulo: "Mickey 17",
-        descripcion: "Mickey 17, la decimoséptima iteración de Mickey, tiene la tarea de capturar la forma de vida similar a una oruga de Niflheim para su análisis. Mickey 17 cae en una fisura en el hielo, fuera del alcance de Timo, quien se va y reporta la muerte de Mickey 17.",
-        genero: "Ciencia ficción",
-    },
-    {
-        id: 2,
-        titulo: "Capitán América: Un nuevo mundo",
-        descripcion: "Tras reunirse con el recientemente electo presidente de los Estados Unidos Thaddeus Ross, Sam se encuentra en medio de un conflicto internacional.",
-        genero: "Acción",
-    },
-    {
-        id: 3,
-        titulo: "Flow",
-        descripcion: "Un gato se despierta en un mundo cubierto de agua, donde la raza humana parece haber desaparecido.",
-        genero: "Aventura",
-    },
-    {
-        id: 4,
-        titulo: "Sonic 3",
-        descripcion: "Una aventura llena de acción con Sonic y sus amigos.",
-        genero: "Aventura",
-    },
-];
+    const checkLog = () => {
+        if (!localStorage.getItem('datosUsuario')){
+            return false;
+        }
+        return true;
+    }
 
-function mostrarPeliculas() {
-    console.log("Películas disponibles:");
-    peliculas.forEach(pelicula => {
-        console.log(`
-    Opción #${pelicula.id}
-    Título: ${pelicula.titulo}
-    Descripción: ${pelicula.descripcion}
-    Género: ${pelicula.genero}
-    ----------------------------`);
+    function initDots() {
+        dotsContainer.innerHTML = '';
+        carouselItems.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (index === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(index));
+            dotsContainer.appendChild(dot);
+        });
+    }
+    
+    function updateCarousel() {
+        carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+        document.querySelectorAll('.carousel-dots .dot').forEach((dot, index) => {
+            dot.classList.toggle('active', index === currentIndex);
+        });
+    }
+    
+    function goToSlide(index) {
+        currentIndex = index;
+        updateCarousel();
+        resetAutoSlide();
+    }
+    function prevSlide() {
+        currentIndex = (currentIndex > 0) ? currentIndex - 1 : carouselItems.length - 1;
+        updateCarousel();
+        resetAutoSlide();
+    }
+    
+    function nextSlide() {
+        currentIndex = (currentIndex < carouselItems.length - 1) ? currentIndex + 1 : 0;
+        updateCarousel();
+        resetAutoSlide();
+    }
+    
+    function startAutoSlide() {
+        autoSlideInterval = setInterval(nextSlide, slideIntervalTime);
+    }
+    
+    function resetAutoSlide() {
+        clearInterval(autoSlideInterval);
+        startAutoSlide();
+    }
+    
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
+    
+    openModal.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (!checkLog()) {
+            return;
+        }
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        initDots();
+        startAutoSlide();
     });
-}
-
-function seleccionarPelicula() {
-    mostrarPeliculas();
     
-    while (true) {
-        const eleccion = convertirNumero("Ingrese el número de ID de la película que escogió:");
-        
-        // Si el usuario cancela
-        if (eleccion === null) {
-            console.log("Selección cancelada por el usuario");
-            return null;
-        }
-        
-        const peliculaSeleccionada = peliculas.find(p => p.id === eleccion);
-        
-        if (peliculaSeleccionada) {
-            alert(`Ha seleccionado: "${peliculaSeleccionada.titulo}"`);
-            return peliculaSeleccionada;
-        } else {
-            alert("ID no válido. Las opciones son: 1, 2, 3 o 4");
-        }
-    }
-}
-
-const botonSeleccionar = document.getElementById("seleccionar");
-
-botonSeleccionar.addEventListener("click", function() {
-    const user = obtenerUser();
-    if (!verificarUser(user)) {
-        return;
-    }
+    closeModal.addEventListener('click', function() {
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+        clearInterval(autoSlideInterval);
+    });
     
-    const peliculaElegida = seleccionarPelicula();
-    if (peliculaElegida) {
-        console.log("Película seleccionada:", peliculaElegida);
-    }
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            clearInterval(autoSlideInterval);
+        }
+    });
+    
+    carousel.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
+    carousel.addEventListener('mouseleave', startAutoSlide);
+    
+
+    document.addEventListener('keydown', function(e) {
+        if (modal.classList.contains('active')) {
+            if (e.key === 'ArrowLeft') prevSlide();
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'Escape') {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                clearInterval(autoSlideInterval);
+            }
+        }
+    });
 });
