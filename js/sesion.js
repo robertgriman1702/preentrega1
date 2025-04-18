@@ -1,38 +1,43 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const openModalBtn = document.getElementById('sesion');
-    const closeModal = document.querySelectorAll('.close-modal');
-    const modal = document.querySelector('.modal');
+    const modal = document.getElementById('auth-modal');
     const loginForm = document.getElementById('Login-Form');
-    const OpenRegistrarse = document.getElementById('otro-modal');
-    const registro = document.getElementById('register-form');
-    const volverALogin = document.getElementById('vueltaModal');
+    const registerForm = document.getElementById('register-form');
+    const showRegisterButton = document.getElementById('show-register-form');
+    const showLoginButton = document.getElementById('show-login-form');
     const userStatusContainer = document.getElementById('user-status');
-    
-    const loginMessage = document.createElement('div');
-    const registerMessage = document.createElement('div');
-    loginMessage.className = 'message';
-    registerMessage.className = 'message';
-    loginForm.prepend(loginMessage);
-    registro.prepend(registerMessage);
+    const loginMessage = document.getElementById('login-message');
+    const registerMessage = document.getElementById('register-message');
 
-    loginForm.classList.remove('hidden');
-    registro.classList.remove('active');
-    
-    checkLoginStatus();
-
-    openModalBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        modal.classList.add('active');
-        loginForm.classList.remove('hidden');
-        registro.classList.remove('active');
+    function clearMessages() {
         loginMessage.textContent = '';
+        loginMessage.className = 'message';
         registerMessage.textContent = '';
-    });
+        registerMessage.className = 'message';
+    }
 
-    closeModal.forEach(btn => {
-        btn.addEventListener('click', () => {
-            modal.classList.remove('active');
-        });
+    function openLoginModal() {
+        clearMessages();
+        loginForm.classList.add('active');
+        registerForm.classList.remove('active');
+        modal.classList.add('active');
+    }
+
+    function switchToRegisterForm() {
+        clearMessages();
+        loginForm.classList.remove('active');
+        registerForm.classList.add('active');
+    }
+
+    function switchToLoginForm() {
+        clearMessages();
+        registerForm.classList.remove('active');
+        loginForm.classList.add('active');
+    }
+
+    document.getElementById('sesion').addEventListener('click', openLoginModal);
+
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', () => modal.classList.remove('active'));
     });
 
     modal.addEventListener('click', (e) => {
@@ -41,139 +46,108 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    OpenRegistrarse.addEventListener('click', (e) => {
-        e.preventDefault();
-        loginForm.classList.add('hidden');
-        registro.classList.add('active');
-        loginMessage.textContent = '';
-        registerMessage.textContent = '';
-    });
+    showRegisterButton.addEventListener('click', switchToRegisterForm);
+    showLoginButton.addEventListener('click', switchToLoginForm);
 
-    volverALogin.textContent = '¿Ya tienes cuenta? Inicia sesión';
-    volverALogin.addEventListener('click', (e) => {
-        e.preventDefault();
-        registro.classList.remove('active');
-        loginForm.classList.remove('hidden');
-        loginMessage.textContent = '';
-        registerMessage.textContent = '';
-    });
-
-    registro.addEventListener("submit", (event) => {
+    registerForm.addEventListener("submit", (event) => {
         event.preventDefault();
-        const formData = new FormData(event.target);
-        const userData = {
-            nombre: formData.get('nombre'),
-            email: formData.get('email'),
-            usuario: formData.get('usuario'),
-            contraseña: formData.get('contraseña')
-        };
+        clearMessages();
+        const nombre = event.target.nombre.value.trim();
+        const email = event.target.email.value.trim();
+        const usuario = event.target.usuario.value.trim();
+        const contraseña = event.target.contraseña.value;
 
-        if (!userData.nombre || !userData.email || !userData.usuario || !userData.contraseña) {
-            registerMessage.textContent = 'Por favor completa todos los campos';
-            registerMessage.className = 'message error';
-            return;
+        if (!nombre || !email || !usuario || !contraseña) {
+             registerMessage.textContent = 'Todos los campos son obligatorios.';
+             registerMessage.className = 'message error';
+             return;
         }
 
-        localStorage.setItem('userData', JSON.stringify(userData));
-        registro.classList.remove('active');
-        loginForm.classList.remove('hidden');
-        loginMessage.textContent = 'Registro exitoso. Ahora puedes iniciar sesión.';
-        loginMessage.className = 'message success';
-        event.target.reset();
+        try {
+            localStorage.setItem('userData', JSON.stringify({
+                nombre: nombre,
+                email: email,
+                usuario: usuario,
+                contraseña: contraseña
+            }));
+            localStorage.setItem('isLoggedIn', 'false');
+            switchToLoginForm();
+        } catch (e) {
+             registerMessage.textContent = 'Error al guardar los datos. Intenta de nuevo.';
+             registerMessage.className = 'message error';
+             console.error("Error saving to localStorage:", e);
+        }
     });
 
     loginForm.addEventListener("submit", (event) => {
         event.preventDefault();
-        const formData = new FormData(event.target);
-        const loginUsuario = formData.get('usuario');
-        const loginContraseña = formData.get('contraseña');
+        clearMessages();
+        const inputUsuario = event.target.usuario.value.trim();
+        const inputContraseña = event.target.contraseña.value;
 
-        if (!loginUsuario || !loginContraseña) {
-            loginMessage.textContent = 'Por favor ingresa usuario y contraseña';
+        if (!inputUsuario || !inputContraseña) {
+            loginMessage.textContent = 'Usuario y contraseña son requeridos.';
             loginMessage.className = 'message error';
             return;
         }
 
-        const savedUserData = JSON.parse(localStorage.getItem('userData'));
+        const savedUserDataString = localStorage.getItem('userData');
+        let loginSuccess = false;
 
-        if (!savedUserData) {
-            loginMessage.textContent = 'No hay usuarios registrados. Por favor regístrate primero.';
-            loginMessage.className = 'message error';
-            return;
+        if (savedUserDataString) {
+            try {
+                const savedUserData = JSON.parse(savedUserDataString);
+                if (inputUsuario === savedUserData.usuario && inputContraseña === savedUserData.contraseña) {
+                    loginSuccess = true;
+                }
+            } catch (e) {
+                console.error("Error parsing user data from localStorage:", e);
+                loginMessage.textContent = 'Error al procesar datos de usuario.';
+                loginMessage.className = 'message error';
+                return;
+            }
         }
 
-        if (loginUsuario === savedUserData.usuario && loginContraseña === savedUserData.contraseña) {
+        if (loginSuccess) {
             localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('currentUser', JSON.stringify({
-                nombre: savedUserData.nombre,
-                email: savedUserData.email,
-                usuario: savedUserData.usuario
-            }));
-            
             modal.classList.remove('active');
             checkLoginStatus();
-            
-            const welcomeMessage = document.createElement('div');
-            welcomeMessage.className = 'message success';
-            welcomeMessage.textContent = `Bienvenido ${savedUserData.nombre}!`;
-            userStatusContainer.prepend(welcomeMessage);
-            
-            setTimeout(() => {
-                welcomeMessage.remove();
-            }, 3000);
-            
-            event.target.reset();
-            
-            document.dispatchEvent(new CustomEvent('loginStatusChanged', {
-                detail: { isLoggedIn: true, user: savedUserData }
-            }));
+            loginForm.reset();
         } else {
-            loginMessage.textContent = 'Usuario o contraseña incorrectos';
+            loginMessage.textContent = 'Usuario o contraseña incorrectos.';
             loginMessage.className = 'message error';
+            localStorage.setItem('isLoggedIn', 'false');
         }
     });
 
     function checkLoginStatus() {
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        
-        if (isLoggedIn && currentUser) {
-            userStatusContainer.innerHTML = `
-                <span>Bienvenido, ${currentUser.nombre}</span>
-                <button id="logout">Cerrar sesión</button>
-            `;
-            
-            document.getElementById('logout').addEventListener('click', logout);
+        const userDataString = localStorage.getItem('userData');
+
+        if (isLoggedIn && userDataString) {
+            try {
+                const userData = JSON.parse(userDataString);
+                userStatusContainer.innerHTML = `
+                    <span>Bienvenido, ${userData.nombre}</span>
+                    <button id="logout">Cerrar sesión</button>
+                `;
+                document.getElementById('logout').addEventListener('click', () => {
+                    localStorage.removeItem('isLoggedIn');
+                    checkLoginStatus();
+                });
+            } catch (e) {
+                 console.error("Error parsing user data for welcome message:", e);
+                 localStorage.removeItem('isLoggedIn');
+                 localStorage.removeItem('userData');
+                 userStatusContainer.innerHTML = '<button id="sesion">Iniciar sesión</button>';
+                 document.getElementById('sesion').addEventListener('click', openLoginModal);
+            }
         } else {
+            if (isLoggedIn) localStorage.removeItem('isLoggedIn');
             userStatusContainer.innerHTML = '<button id="sesion">Iniciar sesión</button>';
-            
-            document.getElementById('sesion').addEventListener('click', (e) => {
-                e.preventDefault();
-                modal.classList.add('active');
-                loginForm.classList.remove('hidden');
-                registro.classList.remove('active');
-                loginMessage.textContent = '';
-                registerMessage.textContent = '';
-            });
+            document.getElementById('sesion').addEventListener('click', openLoginModal);
         }
     }
 
-    function logout() {
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('currentUser');
-        checkLoginStatus();
-        
-        const goodbyeMessage = document.createElement('div');
-        goodbyeMessage.className = 'message success';
-        goodbyeMessage.textContent = 'Has cerrado sesión correctamente';
-        userStatusContainer.prepend(goodbyeMessage);
-        
-        setTimeout(() => {
-            goodbyeMessage.remove();
-        }, 3000);
-        
-        document.dispatchEvent(new CustomEvent('loginStatusChanged', {
-            detail: { isLoggedIn: false }
-        }));
-    }
+    checkLoginStatus();
 });

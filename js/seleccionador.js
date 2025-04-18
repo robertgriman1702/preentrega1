@@ -1,198 +1,134 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.querySelector('.modal-seleccionador');
     const openModalButton = document.getElementById('seleccionar');
     const closeModalButton = document.querySelector('.close-modal-seleccionador');
-    const modal = document.querySelector('.modal-seleccionador');
     const carousel = document.querySelector('.modal-seleccionador .carousel');
+    const carouselItems = document.querySelectorAll('.modal-seleccionador .carousel-item');
     const prevBtn = document.querySelector('.modal-seleccionador .prev-btn');
     const nextBtn = document.querySelector('.modal-seleccionador .next-btn');
     const dotsContainer = document.querySelector('.modal-seleccionador .carousel-dots');
-    const mensajeSesion = document.getElementById('mensaje-sesion');
-    const closeMensajeButton = document.querySelector('.close-mensaje-sesion');
+    const mensajeSesionModal = document.getElementById('mensaje-sesion');
+    const closeMensajeSesionButton = document.querySelector('.close-mensaje-sesion');
 
-    let carouselItems = []; 
     let currentIndex = 0;
-    let autoSlideInterval;
-    const slideIntervalTime = 5000; 
+    const totalItems = carouselItems.length;
 
-    const checkLogin = () => {
-        try {
-            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-
-            if (!isLoggedIn || !currentUser.usuario) {
-                showLoginMessage();
-                return false;
-            }
-            return true;
-        } catch (error) {
-            console.error('Error checking login:', error);
-            showLoginMessage(); 
-            return false;
-        }
-    };
-
-    const showLoginMessage = () => {
-        if (!mensajeSesion) return;
-
-        mensajeSesion.classList.add('active');
-        document.body.style.overflow = 'hidden';
-
-        const timeout = setTimeout(closeMessageAndShowLogin, 3000);
-
-       
-        if (closeMensajeButton) {
-            const clickHandler = () => {
-                clearTimeout(timeout);
-                closeMessageAndShowLogin();
-                closeMensajeButton.removeEventListener('click', clickHandler);
-            };
-           
-            closeMensajeButton.removeEventListener('click', clickHandler);
-            closeMensajeButton.addEventListener('click', clickHandler);
-        }
-    };
-
-    const closeMessageAndShowLogin = () => {
-        if (mensajeSesion) {
-            mensajeSesion.classList.remove('active');
-        }
-        document.body.style.overflow = 'auto'; 
-
-        const loginModal = document.querySelector('.modal'); 
-        const loginForm = document.getElementById('Login-Form');
-        const registerForm = document.getElementById('register-form');
-
-        if (loginModal) loginModal.classList.add('active');
-        if (loginForm) loginForm.classList.remove('hidden'); 
-        if (registerForm) registerForm.classList.remove('active'); 
-    };
-
-    function updateCarouselItems() {
-        if(carousel) {
-            carouselItems = carousel.querySelectorAll('.carousel-item');
-        } else {
-            carouselItems = [];
-        }
-    }
-
-    function initDots() {
-        if (!dotsContainer || !carouselItems || carouselItems.length === 0) return;
-
-        dotsContainer.innerHTML = ''; 
-        carouselItems.forEach((_, index) => {
-            const dot = document.createElement('div');
-            dot.classList.add('dot');
-            if (index === currentIndex) dot.classList.add('active'); 
-            dot.addEventListener('click', () => goToSlide(index));
-            dotsContainer.appendChild(dot);
-        });
-    }
-
-    function updateCarousel() {
-        if (!carousel || !carouselItems || carouselItems.length === 0) return;
-
-        const offset = -currentIndex * 100;
-        carousel.style.transform = `translateX(${offset}%)`;
-
-        if (dotsContainer) {
-            const dots = dotsContainer.querySelectorAll('.dot');
-            dots.forEach((dot, index) => {
-                dot.classList.toggle('active', index === currentIndex);
-            });
-        }
-    }
-
-    function goToSlide(index) {
-        if (!carouselItems || carouselItems.length === 0) return;
-        currentIndex = index;
-        updateCarousel();
-        resetAutoSlide();
-    }
-
-    function prevSlide() {
-        if (!carouselItems || carouselItems.length === 0) return;
-        currentIndex = (currentIndex > 0) ? currentIndex - 1 : carouselItems.length - 1;
-        updateCarousel();
-        resetAutoSlide();
-    }
-
-    function nextSlide() {
-        if (!carouselItems || carouselItems.length === 0) return;
-        currentIndex = (currentIndex < carouselItems.length - 1) ? currentIndex + 1 : 0;
-        updateCarousel();
-        resetAutoSlide();
-    }
-
-    function startAutoSlide() {
-        if (!carouselItems || carouselItems.length <= 1) return; 
-        clearInterval(autoSlideInterval); 
-        autoSlideInterval = setInterval(nextSlide, slideIntervalTime);
-    }
-
-    function stopAutoSlide() {
-        clearInterval(autoSlideInterval);
-    }
-
-    function resetAutoSlide() {
-        stopAutoSlide();
-        startAutoSlide();
+    function showLoginMessageModal() {
+        mensajeSesionModal.classList.add('active');
     }
 
     if (openModalButton) {
-        openModalButton.addEventListener('click', (e) => {
-            e.preventDefault();
-
-            if (!checkLogin()) {
-                return; 
+        openModalButton.addEventListener('click', () => {
+            if (localStorage.getItem('isLoggedIn') !== 'true') {
+                showLoginMessageModal();
+                return;
             }
-
-            if (modal) {
+            if (totalItems > 0) {
                 modal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-                updateCarouselItems();
-                currentIndex = 0; 
+                currentIndex = 0;
                 updateCarousel();
-                initDots(); 
-                startAutoSlide(); 
+            } else {
+                console.warn("Selector carousel has no items.");
             }
         });
+    } else {
+        console.error("Button with id 'seleccionar' not found.");
     }
 
     if (closeModalButton) {
         closeModalButton.addEventListener('click', () => {
-            if (modal) modal.classList.remove('active');
-            document.body.style.overflow = 'auto';
-            stopAutoSlide();
+            modal.classList.remove('active');
+        });
+    }
+
+    if (closeMensajeSesionButton) {
+        closeMensajeSesionButton.addEventListener('click', () => {
+            mensajeSesionModal.classList.remove('active');
+        });
+    }
+
+    if (mensajeSesionModal) {
+        mensajeSesionModal.addEventListener('click', (e) => {
+             if (e.target === mensajeSesionModal) {
+                 mensajeSesionModal.classList.remove('active');
+             }
         });
     }
 
     if (modal) {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-                stopAutoSlide();
-            }
+         modal.addEventListener('click', (e) => {
+             if (e.target === modal) {
+                 modal.classList.remove('active');
+             }
+         });
+     }
+
+    function updateCarousel() {
+        if (!carousel || totalItems === 0) return;
+        const percentage = -(currentIndex * 100);
+        carousel.style.transform = `translateX(${percentage}%)`;
+        updateDots();
+    }
+
+    function updateDots() {
+        if (!dotsContainer) return;
+        const dots = dotsContainer.querySelectorAll('.dot');
+        if (dots.length !== totalItems) {
+            createDots();
+        }
+        dotsContainer.querySelectorAll('.dot').forEach((dot, i) => {
+            dot.classList.toggle('active', i === currentIndex);
         });
     }
+
+    function goToSlide(index) {
+        if (index < 0 || index >= totalItems) {
+            console.warn("Invalid slide index requested:", index);
+            return;
+        }
+        currentIndex = index;
+        updateCarousel();
+    }
+
+    function prevSlide() {
+        if (totalItems === 0) return;
+        currentIndex = (currentIndex > 0) ? currentIndex - 1 : totalItems - 1;
+        updateCarousel();
+    }
+
+    function nextSlide() {
+        if (totalItems === 0) return;
+        currentIndex = (currentIndex < totalItems - 1) ? currentIndex + 1 : 0;
+        updateCarousel();
+    }
+
     if (prevBtn) prevBtn.addEventListener('click', prevSlide);
     if (nextBtn) nextBtn.addEventListener('click', nextSlide);
 
-    if (carousel) {
-        carousel.addEventListener('mouseenter', stopAutoSlide);
-        carousel.addEventListener('mouseleave', startAutoSlide);
+    function createDots() {
+        if (!dotsContainer || totalItems === 0) return;
+        dotsContainer.innerHTML = '';
+
+        for (let i = 0; i < totalItems; i++) {
+            const dot = document.createElement('button');
+            dot.classList.add('dot');
+            dot.setAttribute('aria-label', `Ir a película ${i + 1}`);
+            dot.setAttribute('type', 'button');
+            if (i === currentIndex) {
+                dot.classList.add('active');
+            }
+            dot.addEventListener('click', () => goToSlide(i));
+            dotsContainer.appendChild(dot);
+        }
     }
 
-    document.addEventListener('keydown', (e) => {
-        if (modal && modal.classList.contains('active')) {
-            if (e.key === 'ArrowLeft') {
-                prevSlide();
-            } else if (e.key === 'ArrowRight') {
-                nextSlide();
-            } else if (e.key === 'Escape') {
-                if (closeModalButton) closeModalButton.click(); 
-            }
-        }
-    });
-
+    if (totalItems > 0) {
+        createDots();
+        updateCarousel();
+    } else {
+        if(prevBtn) prevBtn.style.display = 'none';
+        if(nextBtn) nextBtn.style.display = 'none';
+        if(dotsContainer) dotsContainer.style.display = 'none';
+        console.warn("Selector modal carousel initialized with no items.");
+    }
 });

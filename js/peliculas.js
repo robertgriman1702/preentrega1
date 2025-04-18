@@ -1,71 +1,75 @@
-document.addEventListener('DOMContentLoaded', ()=> {
-    const slider = document.querySelector('.slider');
-    const track = document.querySelector('.slider-track');
-    const slides = document.querySelectorAll('.slide');
-    const prevBtn = document.querySelector('.prev-slide');
-    const nextBtn = document.querySelector('.next-slide');
-    const dotsContainer = document.querySelector('.slider-dots');
-    
-    let currentIndex = 0;
-    let autoSlideInterval;
-    const slideInterval = 5000;
+document.addEventListener('DOMContentLoaded', () => {
+    const sliderContainer = document.querySelector('.main-content .slider-container');
+    const track = document.querySelector('.main-content .slider-track');
+    const slides = document.querySelectorAll('.main-content .slide');
+    const prevBtn = document.querySelector('.main-content .prev-slide');
+    const nextBtn = document.querySelector('.main-content .next-slide');
+    const dotsContainer = document.querySelector('.main-content .slider-dots');
 
-    const createDots = () => {
-        slides.forEach((_, index) => {
-            const dot = document.createElement('div');
-            dot.classList.add('dot');
-            if (index === 0) dot.classList.add('active');
-            dot.addEventListener('click', () => goToSlide(index));
-            dotsContainer.appendChild(dot);
+    if (!sliderContainer || !track || !slides.length || !prevBtn || !nextBtn || !dotsContainer) {
+        console.warn("Main slider elements not found or slider has no slides. Slider functionality disabled.");
+        if(prevBtn) prevBtn.style.display = 'none';
+        if(nextBtn) nextBtn.style.display = 'none';
+        if(dotsContainer) dotsContainer.style.display = 'none';
+        return;
+    }
+
+    let currentIndex = 0;
+    const totalSlides = slides.length;
+
+    function updateSlider() {
+        const percentage = -(currentIndex * 100);
+        track.style.transform = `translateX(${percentage}%)`;
+        updateDots();
+    }
+
+    function updateDots() {
+        const dots = dotsContainer.querySelectorAll('.dot');
+        if (dots.length !== totalSlides) {
+            createDots();
+        }
+        dotsContainer.querySelectorAll('.dot').forEach((dot, i) => {
+            dot.classList.toggle('active', i === currentIndex);
         });
     }
-    
-    const updateSlider = () => {
-        track.style.transform = `translateX(-${currentIndex * 100}%)`;
-        
-        document.querySelectorAll('.slider-dots .dot').forEach((dot, index) => {
-            dot.classList.toggle('active', index === currentIndex);
-        });
-    }
-    
-    const goToSlide = (index) =>{
+
+    function goToSlide(index) {
+         if (index < 0 || index >= totalSlides) {
+            console.warn("Invalid slide index requested:", index);
+            return;
+        }
         currentIndex = index;
         updateSlider();
-        resetAutoSlide();
     }
 
-    const prevSlide =() => {
-        currentIndex = (currentIndex > 0) ? currentIndex - 1 : slides.length - 1;
+    function prevSlide() {
+        currentIndex = (currentIndex > 0) ? currentIndex - 1 : totalSlides - 1;
         updateSlider();
-        resetAutoSlide();
     }
-    
-    const nextSlide = () => {
-        currentIndex = (currentIndex < slides.length - 1) ? currentIndex + 1 : 0;
+
+    function nextSlide() {
+        currentIndex = (currentIndex < totalSlides - 1) ? currentIndex + 1 : 0;
         updateSlider();
-        resetAutoSlide();
     }
-    
-    const startAutoSlide = () => {
-        autoSlideInterval = setInterval(nextSlide, slideInterval);
+
+    function createDots() {
+        dotsContainer.innerHTML = '';
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('button');
+            dot.classList.add('dot');
+            dot.setAttribute('aria-label', `Ir a slide ${i + 1}`);
+            dot.setAttribute('type', 'button');
+            if (i === currentIndex) {
+                dot.classList.add('active');
+            }
+            dot.addEventListener('click', () => goToSlide(i));
+            dotsContainer.appendChild(dot);
+        }
     }
-    
-    const resetAutoSlide = () => {
-        clearInterval(autoSlideInterval);
-        startAutoSlide();
-    }
-    
+
     prevBtn.addEventListener('click', prevSlide);
     nextBtn.addEventListener('click', nextSlide);
 
     createDots();
-    startAutoSlide();
-    
-    slider.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
-    slider.addEventListener('mouseleave', startAutoSlide);
-    
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowLeft') prevSlide();
-        if (e.key === 'ArrowRight') nextSlide();
-    });
+    updateSlider();
 });
