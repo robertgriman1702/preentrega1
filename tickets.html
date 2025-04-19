@@ -1,12 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zona de compra</title>
+    <title>Tu Entrada - Cine Unidos</title>
+    <link rel="stylesheet" href="/css/ticketStyle.css">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    
-    
+
+    <header class="hero">
+        <h1>Bienvenido a Nuestro Cine</h1>
+        <nav>
+            <ul class="menu">
+                <li class="menu-item"><a href="index.html">Inicio</a></li> 
+                <li class="menu-item"><a href="#">Próximos Estrenos</a></li>
+                <li class="menu-item"><a href="#">Películas Disponibles</a></li>
+                <div id="user-status">
+                    
+                    <button id="sesion" type="button">Iniciar Sesión</button>
+                </div>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="ticket-page-content">
+        <h2 class="section-title">Tu Entrada Seleccionada</h2>
+
+        <div class="ticket-container" aria-labelledby="ticket-movie-title">
+            <div class="ticket-main">
+                <div class="ticket-visual">
+                    <img id="ticket-poster-img" src="img/placeholder-poster.png" alt="Poster de la película" loading="lazy">
+                
+                </div>
+                <div class="ticket-info">
+                    <h3 id="ticket-movie-title">Cargando Título...</h3>
+                    <div class="ticket-meta">
+                        <span><i class="icon-clock"></i> Duración: <strong id="ticket-duration">-- min</strong></span>
+                        <span><i class="icon-star"></i> Rating: <strong id="ticket-rating">★ --</strong></span>
+                        <span><i class="icon-tag"></i> Género: <strong id="ticket-genre">--</strong></span>
+                    </div>
+                    <div class="ticket-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Fecha:</span>
+                            <span class="detail-value">Hoy</span> 
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Hora:</span>
+                            <span class="detail-value">20:00</span> 
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Sala:</span>
+                            <span class="detail-value">5</span> 
+                        </div>
+                         <div class="detail-item">
+                            <span class="detail-label">Asiento:</span>
+                            <span class="detail-value">Fila G, Asiento 12</span> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ticket-stub">
+                 <div class="stub-info">
+                     <span class="stub-label">Usuario:</span>
+                     <span id="ticket-user-name" class="stub-value">Invitado</span>
+                 </div>
+                 <div class="stub-qr">
+                   
+                    <img src="img/qr-code-placeholder.svg" alt="Código QR de la entrada">
+                 </div>
+                 <div class="stub-movie-title-small" id="ticket-movie-title-stub">
+                    Cargando...
+                 </div>
+            </div>
+        </div>
+    </main>
+    <script type="module" src="js/sesion.js"></script>
+    <script type="module" src="js/tickets.js"></script>
+
 </body>
 </html>

@@ -150,5 +150,8 @@ document.addEventListener('DOMContentLoaded', () => {
         movies.push(selectedMovieObj);
         localStorage.setItem('movies', JSON.stringify(movies));
         modal.classList.remove('active');
+        setTimeout(() => {
+            window.location.href = 'tickets.html';
+        }, 1000);
     });
 });
