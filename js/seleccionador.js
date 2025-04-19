@@ -133,17 +133,23 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn("Selector modal carousel initialized with no items.");
     }
     class movie{
-        constructor(id, title, image) {
+        constructor(id, title, image, duration, genre, rating){ {
             this.id = id;
             this.title = title;
+            this.duration = duration;
+            this.genre = genre;
+            this.rating = rating;
             this.image = image;
         }
-    }
+    }}
     guardarPeli.addEventListener('click', () => {
         const id = crypto.randomUUID();
         const selectedMovie = carouselItems[currentIndex].querySelector('h3').textContent;
         const selectedmovieImage = carouselItems[currentIndex].querySelector('img').src;
-        const selectedMovieObj = new movie(id, selectedMovie, selectedmovieImage);
+        const selectedmovieDuration = carouselItems[currentIndex].querySelector('.duration').textContent;
+        const selectedmovieGenre = carouselItems[currentIndex].querySelector('.genre').textContent;    
+        const selectedmovieRating = carouselItems[currentIndex].querySelector('.rating').textContent;
+        const selectedMovieObj = new movie(id, selectedMovie, selectedmovieImage, selectedmovieDuration, selectedmovieGenre, selectedmovieRating);
         console.log(selectedMovieObj);
 
         const movies = JSON.parse(localStorage.getItem('movies') || '[]');

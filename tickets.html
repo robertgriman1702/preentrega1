@@ -15,9 +15,8 @@
             <ul class="menu">
                 <li class="menu-item"><a href="index.html">Inicio</a></li> 
                 <li class="menu-item"><a href="#">Próximos Estrenos</a></li>
-                <li class="menu-item"><a href="#">Películas Disponibles</a></li>
-                <div id="user-status">
-                    
+                <li class="menu-item"><a href="index.html">Películas Disponibles</a></li>
+                <div id="user-status">       
                     <button id="sesion" type="button">Iniciar Sesión</button>
                 </div>
             </ul>
@@ -31,7 +30,6 @@
             <div class="ticket-main">
                 <div class="ticket-visual">
                     <img id="ticket-poster-img" src="img/placeholder-poster.png" alt="Poster de la película" loading="lazy">
-                
                 </div>
                 <div class="ticket-info">
                     <h3 id="ticket-movie-title">Cargando Título...</h3>
@@ -65,7 +63,7 @@
                      <span class="stub-label">Usuario:</span>
                      <span id="ticket-user-name" class="stub-value">Invitado</span>
                  </div>
-                 <div class="stub-qr">
+                 <div id="qr-cod" class="stub-qr">
                    
                     <img src="img/qr-code-placeholder.svg" alt="Código QR de la entrada">
                  </div>
@@ -75,6 +73,7 @@
             </div>
         </div>
     </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <script type="module" src="js/sesion.js"></script>
     <script type="module" src="js/tickets.js"></script>
 
