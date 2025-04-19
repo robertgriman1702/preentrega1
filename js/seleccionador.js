@@ -9,11 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const dotsContainer = document.querySelector('.modal-seleccionador .carousel-dots');
     const mensajeSesionModal = document.getElementById('mensaje-sesion');
     const closeMensajeSesionButton = document.querySelector('.close-mensaje-sesion');
+    const guardarPeli = document.getElementById('guardar-pelicula')
 
     let currentIndex = 0;
     const totalItems = carouselItems.length;
 
-    function showLoginMessageModal() {
+    const showLoginMessageModal = () => {
         mensajeSesionModal.classList.add('active');
     }
 
@@ -105,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (prevBtn) prevBtn.addEventListener('click', prevSlide);
     if (nextBtn) nextBtn.addEventListener('click', nextSlide);
 
-    function createDots() {
+    const createDots = () =>{
         if (!dotsContainer || totalItems === 0) return;
         dotsContainer.innerHTML = '';
 
@@ -131,4 +132,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if(dotsContainer) dotsContainer.style.display = 'none';
         console.warn("Selector modal carousel initialized with no items.");
     }
+    class movie{
+        constructor(id, title, image) {
+            this.id = id;
+            this.title = title;
+            this.image = image;
+        }
+    }
+    guardarPeli.addEventListener('click', () => {
+        const id = crypto.randomUUID();
+        const selectedMovie = carouselItems[currentIndex].querySelector('h3').textContent;
+        const selectedmovieImage = carouselItems[currentIndex].querySelector('img').src;
+        const selectedMovieObj = new movie(id, selectedMovie, selectedmovieImage);
+        console.log(selectedMovieObj);
+
+        const movies = JSON.parse(localStorage.getItem('movies') || '[]');
+        movies.push(selectedMovieObj);
+        localStorage.setItem('movies', JSON.stringify(movies));
+        modal.classList.remove('active');
+    });
 });
