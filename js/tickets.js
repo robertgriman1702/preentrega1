@@ -23,27 +23,5 @@ document.addEventListener('DOMContentLoaded', () => {
     if (user) {
         usuario.textContent = user.nombre;
     }
-    const qrData = {
-        pelicula: lastMovie.title,
-        duracion: lastMovie.duration,
-        genero: lastMovie.genre,
-        rating: lastMovie.rating,
-    };
 
-    qrContainer.innerHTML = '';
-
-    QRCode.toCanvas(qrContainer, JSON.stringify(qrData), { 
-        width: 200,
-        margin: 1,
-        color: {
-            dark: '#000000',
-            light: '#FFFFFF'
-        }
-    }, (error) => {
-        if (error) {
-            console.error("Error generating QR code:", error);
-            return;
-        }
-        console.log("QR code generated successfully!");
-    });
 });
