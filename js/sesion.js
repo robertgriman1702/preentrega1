@@ -75,7 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
              registerMessage.textContent = 'Error al guardar los datos. Intenta de nuevo.';
              registerMessage.className = 'message error';
-             console.error("Error saving to localStorage:", e);
         }
     });
 
@@ -101,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     loginSuccess = true;
                 }
             } catch (e) {
-                console.error("Error parsing user data from localStorage:", e);
                 loginMessage.textContent = 'Error al procesar datos de usuario.';
                 loginMessage.className = 'message error';
                 return;
@@ -136,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     checkLoginStatus();
                 });
             } catch (e) {
-                 console.error("Error parsing user data for welcome message:", e);
+                 
                  localStorage.removeItem('isLoggedIn');
                  localStorage.removeItem('userData');
                  userStatusContainer.innerHTML = '<button id="sesion">Iniciar sesión</button>';
