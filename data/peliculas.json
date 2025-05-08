@@ -1,0 +1,38 @@
+[
+    {
+      "id": "mickey17",
+      "titulo": "Mickey 17",
+      "descripcion": "Un empleado desechable en una expedición humana enviada a colonizar el mundo helado de Niflheim no permitirá que su clon de reemplazo tome su lugar.",
+      "duracion": "137 min",
+      "rating": "3.6",
+      "genero": "Ciencia ficción",
+      "imagenUrl": "img/a55e6a3b1771606323178493aae5e262.jpg"
+    },
+    {
+      "id": "capitanamerica4",
+      "titulo": "Capitán América: Brave New World",
+      "descripcion": "Sam Wilson asume el manto del Capitán América y se enfrenta a nuevos desafíos y amenazas.",
+      "duracion": "122 min",
+      "rating": "3.0",
+      "genero": "Superhéroes",
+      "imagenUrl": "img/MV5BNDRjY2E0ZmEtN2QwNi00NTEwLWI3MWItODNkMGYwYWFjNGE0XkEyXkFqcGc@._V1_.jpg"
+    },
+    {
+      "id": "flow",
+      "titulo": "Flow",
+      "descripcion": "Una aventura animada sobre el ciclo del agua y la importancia de la naturaleza.",
+      "duracion": "85 min",
+      "rating": "3.7",
+      "genero": "Aventura",
+      "imagenUrl": "img/MV5BOTM5ODBlOTAtYjcwZi00YzkzLWIzODEtMTM2MTZlNDFmMWU2XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"
+    },
+    {
+      "id": "sonic3",
+      "titulo": "Sonic 3",
+      "descripcion": "Sonic se une a sus amigos para enfrentarse a un nuevo y poderoso enemigo que amenaza el universo.",
+      "duracion": "109 min",
+      "rating": "3.5",
+      "genero": "Aventura",
+      "imagenUrl": "img/sonic-3-pelicula-4275727.jpg"
+    }
+  ]

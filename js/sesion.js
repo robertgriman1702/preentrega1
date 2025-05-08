@@ -5,14 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const showRegisterButton = document.getElementById('show-register-form');
     const showLoginButton = document.getElementById('show-login-form');
     const userStatusContainer = document.getElementById('user-status');
-    const loginMessage = document.getElementById('login-message');
-    const registerMessage = document.getElementById('register-message');
 
     function clearMessages() {
-        loginMessage.textContent = '';
-        loginMessage.className = 'message';
-        registerMessage.textContent = '';
-        registerMessage.className = 'message';
+        loginForm.reset();
+        registerForm.reset();
     }
 
     function openLoginModal() {
@@ -51,16 +47,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     registerForm.addEventListener("submit", (event) => {
         event.preventDefault();
-        clearMessages();
         const nombre = event.target.nombre.value.trim();
         const email = event.target.email.value.trim();
         const usuario = event.target.usuario.value.trim();
         const contraseña = event.target.contraseña.value;
 
         if (!nombre || !email || !usuario || !contraseña) {
-             registerMessage.textContent = 'Todos los campos son obligatorios.';
-             registerMessage.className = 'message error';
-             return;
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Todos los campos son obligatorios.'
+            });
+            return;
         }
 
         try {
@@ -72,21 +70,31 @@ document.addEventListener('DOMContentLoaded', () => {
             }));
             localStorage.setItem('isLoggedIn', 'false');
             switchToLoginForm();
+            Swal.fire({
+                icon: 'success',
+                title: 'Registro Exitoso',
+                text: 'Usuario registrado correctamente.'
+            });
         } catch (e) {
-             registerMessage.textContent = 'Error al guardar los datos. Intenta de nuevo.';
-             registerMessage.className = 'message error';
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al guardar los datos. Intenta de nuevo.'
+            });
         }
     });
 
     loginForm.addEventListener("submit", (event) => {
         event.preventDefault();
-        clearMessages();
         const inputUsuario = event.target.usuario.value.trim();
         const inputContraseña = event.target.contraseña.value;
 
         if (!inputUsuario || !inputContraseña) {
-            loginMessage.textContent = 'Usuario y contraseña son requeridos.';
-            loginMessage.className = 'message error';
+            Swal.fire({
+                icon: 'warning',
+                title: 'Advertencia',
+                text: 'Usuario y contraseña son requeridos.'
+            });
             return;
         }
 
@@ -100,8 +108,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     loginSuccess = true;
                 }
             } catch (e) {
-                loginMessage.textContent = 'Error al procesar datos de usuario.';
-                loginMessage.className = 'message error';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error al procesar datos de usuario.'
+                });
                 return;
             }
         }
@@ -111,9 +122,17 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.classList.remove('active');
             checkLoginStatus();
             loginForm.reset();
+            Swal.fire({
+                icon: 'success',
+                title: 'Inicio de Sesión Exitoso',
+                text: 'Bienvenido!'
+            });
         } else {
-            loginMessage.textContent = 'Usuario o contraseña incorrectos.';
-            loginMessage.className = 'message error';
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Usuario o contraseña incorrectos.'
+            });
             localStorage.setItem('isLoggedIn', 'false');
         }
     });
@@ -132,13 +151,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('logout').addEventListener('click', () => {
                     localStorage.removeItem('isLoggedIn');
                     checkLoginStatus();
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Sesión Cerrada',
+                        text: 'Has cerrado sesión correctamente.'
+                    });
                 });
             } catch (e) {
-                 
-                 localStorage.removeItem('isLoggedIn');
-                 localStorage.removeItem('userData');
-                 userStatusContainer.innerHTML = '<button id="sesion">Iniciar sesión</button>';
-                 document.getElementById('sesion').addEventListener('click', openLoginModal);
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('userData');
+                userStatusContainer.innerHTML = '<button id="sesion">Iniciar sesión</button>';
+                document.getElementById('sesion').addEventListener('click', openLoginModal);
             }
         } else {
             if (isLoggedIn) localStorage.removeItem('isLoggedIn');

@@ -3,53 +3,112 @@ document.addEventListener('DOMContentLoaded', () => {
     const openModalButton = document.getElementById('seleccionar');
     const closeModalButton = document.querySelector('.close-modal-seleccionador');
     const carousel = document.querySelector('.modal-seleccionador .carousel');
-    const carouselItems = document.querySelectorAll('.modal-seleccionador .carousel-item');
     const prevBtn = document.querySelector('.modal-seleccionador .prev-btn');
     const nextBtn = document.querySelector('.modal-seleccionador .next-btn');
     const dotsContainer = document.querySelector('.modal-seleccionador .carousel-dots');
     const mensajeSesionModal = document.getElementById('mensaje-sesion');
     const closeMensajeSesionButton = document.querySelector('.close-mensaje-sesion');
-    const guardarPeli = document.getElementById('guardar-pelicula')
+    const guardarPeliButton = document.getElementById('guardar-pelicula');
 
     let currentIndex = 0;
-    const totalItems = carouselItems.length;
+    let totalItems = 0;
+    let peliculasDisponibles = [];
+
+    async function cargarPeliculasParaSeleccion() {
+        try {
+            const response = await fetch('data/peliculas.json');
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status}`);
+            }
+            peliculasDisponibles = await response.json();
+            totalItems = peliculasDisponibles.length;
+
+            if (totalItems > 0) {
+                renderizarCarouselItems();
+                if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+                if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+                if (guardarPeliButton) guardarPeliButton.addEventListener('click', guardarPeliculaSeleccionada);
+                createDots();
+                updateCarousel();
+            } else {
+                if (carousel) carousel.innerHTML = '<p>No hay películas para seleccionar.</p>';
+                if(prevBtn) prevBtn.style.display = 'none';
+                if(nextBtn) nextBtn.style.display = 'none';
+                if(dotsContainer) dotsContainer.style.display = 'none';
+                if(guardarPeliButton) guardarPeliButton.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Error al cargar películas para el seleccionador:', error);
+            if (carousel) carousel.innerHTML = '<p>Error al cargar películas. Intente más tarde.</p>';
+             if(prevBtn) prevBtn.style.display = 'none';
+            if(nextBtn) nextBtn.style.display = 'none';
+            if(dotsContainer) dotsContainer.style.display = 'none';
+            if(guardarPeliButton) guardarPeliButton.style.display = 'none';
+        }
+    }
+
+    function renderizarCarouselItems() {
+        if (!carousel) return;
+        carousel.innerHTML = '';
+        peliculasDisponibles.forEach(pelicula => {
+            const li = document.createElement('li');
+            li.classList.add('carousel-item');
+            li.innerHTML = `
+                <div class="movie-poster">
+                    <img src="${pelicula.imagenUrl}" alt="Poster de ${pelicula.titulo}" class="slider-img" loading="lazy">
+                </div>
+                <div class="movie-info">
+                    <h3>${pelicula.titulo}</h3>
+                    <div class="movie-meta">
+                        <span class="duration">${pelicula.duracion}</span>
+                        <span class="rating">★ ${pelicula.rating}</span>
+                        <span class="genre">${pelicula.genero}</span>
+                    </div>
+                </div>
+            `;
+            carousel.appendChild(li);
+        });
+    }
 
     const showLoginMessageModal = () => {
-        mensajeSesionModal.classList.add('active');
+        if (mensajeSesionModal) mensajeSesionModal.classList.add('active');
     }
 
     if (openModalButton) {
         openModalButton.addEventListener('click', () => {
-            if (localStorage.getItem('isLoggedIn') !== 'true') {
+            let isLoggedIn = false;
+            try {
+                isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            } catch (e) {
+                console.error("Error al acceder a localStorage:", e);
+            }
+
+            if (!isLoggedIn) {
                 showLoginMessageModal();
                 return;
             }
-            if (totalItems > 0) {
+            if (totalItems > 0 && modal) {
                 modal.classList.add('active');
                 currentIndex = 0;
                 updateCarousel();
-            } else {
-                console.warn("Selector carousel has no items.");
             }
         });
-    } else {
-        console.error("Button with id 'seleccionar' not found.");
     }
 
-    if (closeModalButton) {
+    if (closeModalButton && modal) {
         closeModalButton.addEventListener('click', () => {
             modal.classList.remove('active');
         });
     }
 
-    if (closeMensajeSesionButton) {
+    if (closeMensajeSesionButton && mensajeSesionModal) {
         closeMensajeSesionButton.addEventListener('click', () => {
             mensajeSesionModal.classList.remove('active');
         });
     }
 
     if (mensajeSesionModal) {
-        mensajeSesionModal.addEventListener('click', (e) => {
+         mensajeSesionModal.addEventListener('click', (e) => {
              if (e.target === mensajeSesionModal) {
                  mensajeSesionModal.classList.remove('active');
              }
@@ -72,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateDots() {
-        if (!dotsContainer) return;
+        if (!dotsContainer || totalItems === 0) return;
         const dots = dotsContainer.querySelectorAll('.dot');
         if (dots.length !== totalItems) {
             createDots();
@@ -84,7 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function goToSlide(index) {
         if (index < 0 || index >= totalItems) {
-            console.warn("Invalid slide index requested:", index);
             return;
         }
         currentIndex = index;
@@ -103,13 +161,9 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCarousel();
     }
 
-    if (prevBtn) prevBtn.addEventListener('click', prevSlide);
-    if (nextBtn) nextBtn.addEventListener('click', nextSlide);
-
-    const createDots = () =>{
+    function createDots() {
         if (!dotsContainer || totalItems === 0) return;
         dotsContainer.innerHTML = '';
-
         for (let i = 0; i < totalItems; i++) {
             const dot = document.createElement('button');
             dot.classList.add('dot');
@@ -122,42 +176,53 @@ document.addEventListener('DOMContentLoaded', () => {
             dotsContainer.appendChild(dot);
         }
     }
+    
+    function guardarPeliculaSeleccionada() {
+        if (currentIndex < 0 || currentIndex >= peliculasDisponibles.length) return;
 
-    if (totalItems > 0) {
-        createDots();
-        updateCarousel();
-    } else {
-        if(prevBtn) prevBtn.style.display = 'none';
-        if(nextBtn) nextBtn.style.display = 'none';
-        if(dotsContainer) dotsContainer.style.display = 'none';
-        console.warn("Selector modal carousel initialized with no items.");
-    }
-    class movie{
-        constructor(id, title, image, duration, genre, rating){ {
-            this.id = id;
-            this.title = title;
-            this.duration = duration;
-            this.genre = genre;
-            this.rating = rating;
-            this.image = image;
+        const peliculaSeleccionada = peliculasDisponibles[currentIndex];
+        
+        const peliculaParaGuardar = {
+            id: peliculaSeleccionada.id || crypto.randomUUID(),
+            title: peliculaSeleccionada.titulo,
+            image: peliculaSeleccionada.imagenUrl,
+            duration: peliculaSeleccionada.duracion,
+            genre: peliculaSeleccionada.genero,
+            rating: peliculaSeleccionada.rating
+        };
+
+        try {
+            let moviesEnStorage = [];
+            const moviesString = localStorage.getItem('movies');
+            if (moviesString) {
+                moviesEnStorage = JSON.parse(moviesString);
+            }
+            moviesEnStorage.push(peliculaParaGuardar);
+            localStorage.setItem('movies', JSON.stringify(moviesEnStorage));
+            
+            if (modal) modal.classList.remove('active');
+            
+            Swal.fire({
+                title: '¡Película Seleccionada!',
+                text: 'La película se ha guardado correctamente.',
+                icon: 'success',
+                confirmButtonColor: '#3085d6',
+                timer: 1500,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = 'tickets.html';
+            });
+
+        } catch (error) {
+            console.error('Error al guardar la película seleccionada en localStorage:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Hubo un error al seleccionar la película. Inténtalo de nuevo.',
+                icon: 'error',
+                confirmButtonColor: '#d33'
+            });
         }
-    }}
-    guardarPeli.addEventListener('click', () => {
-        const id = crypto.randomUUID();
-        const selectedMovie = carouselItems[currentIndex].querySelector('h3').textContent;
-        const selectedmovieImage = carouselItems[currentIndex].querySelector('img').src;
-        const selectedmovieDuration = carouselItems[currentIndex].querySelector('.duration').textContent;
-        const selectedmovieGenre = carouselItems[currentIndex].querySelector('.genre').textContent;    
-        const selectedmovieRating = carouselItems[currentIndex].querySelector('.rating').textContent;
-        const selectedMovieObj = new movie(id, selectedMovie, selectedmovieImage, selectedmovieDuration, selectedmovieGenre, selectedmovieRating);
-        console.log(selectedMovieObj);
+    }
 
-        const movies = JSON.parse(localStorage.getItem('movies') || '[]');
-        movies.push(selectedMovieObj);
-        localStorage.setItem('movies', JSON.stringify(movies));
-        modal.classList.remove('active');
-        setTimeout(() => {
-            window.location.href = 'tickets.html';
-        }, 1000);
-    });
+    cargarPeliculasParaSeleccion();
 });

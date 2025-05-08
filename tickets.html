@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tu Entrada - Cine Unidos</title>
-    <link rel="stylesheet" href="/css/ticketStyle.css">
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="css/ticketStyle.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
 
@@ -60,9 +61,8 @@
                      <span class="stub-label">Usuario:</span>
                      <span id="ticket-user-name" class="stub-value">Invitado</span>
                  </div>
-                 <div id="qr-cod" class="stub-qr">
-                   
-                    <img src="" alt="Código QR de la entrada">
+                 <div id="qr-code" class="stub-qr">
+                     <img src="" alt="Código QR de la entrada">
                  </div>
                  <div class="stub-movie-title-small" id="ticket-movie-title-stub">
                     Cargando...
@@ -70,7 +70,8 @@
             </div>
         </div>
     </main>
-    <script type="module" src="js/tickets.js"></script>
+    <script src="js/tickets.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </body>
 </html>
